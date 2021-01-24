@@ -3,7 +3,7 @@
 const config = {
   lineWidth: 1,
   bgColor: 'snow',
-  lines: 'black'
+  lines: 'black',
 };
 
 const url = 'https://demo3884564.mockable.io/gump500';
@@ -30,6 +30,16 @@ function gotData(data_) {
   q = (windowHeight - 50) / getMaxTotal();
   createBars();
   drawBars();
+  if (isDaily(data[i])) {
+    let div = createDiv(
+      '<svg title="Active every day" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="forestgreen" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>'
+    );
+    div.addClass('badge');
+    div.style('width', width / bars.length + 'px');
+    div.style('left', (i * width) / bars.length + 'px');
+    div.style('top', windowHeight - bars[i].total * q + 'px');
+    div.attribute('title', 'Active everyday');
+  }
 }
 
 function draw() {
@@ -60,7 +70,7 @@ function createBars() {
       color: 'red',
       history: data[i].history,
       hitGoal: data[i].total >= 20 ? true : false,
-      dailyRunner: false
+      dailyRunner: false,
     };
     let avg;
     if (bar.history.length > 1) {
@@ -80,17 +90,9 @@ function drawBars() {
     strokeWeight(config.lineWidth);
     stroke(config.lines);
     fill(config.bgColor);
-    rect(i * width / bars.length, 0, width / bars.length, height);
+    rect((i * width) / bars.length, 0, width / bars.length, height);
     fill(bars[i].color, 255, 255);
-    rect(i * width / bars.length, height, width / bars.length, -bars[i].total * q);
-    if (isDaily(data[i])) {
-      let div = createDiv('<svg title="Active every day" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="forestgreen" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>');
-      div.addClass('badge');
-      div.style('width', width / bars.length + 'px');
-      div.style('left', i * width / bars.length + 'px');
-      div.style('top', windowHeight - bars[i].total * q + 'px');
-      div.attribute('title', 'Active everyday');
-    }
+    rect((i * width) / bars.length, height, width / bars.length, -bars[i].total * q);
   }
   textSize(16);
   noStroke();
@@ -105,7 +107,7 @@ function getAvgDays(arr) {
   let sum = 0;
 
   for (let i = 0; i < arr.length - 1; i++) {
-    sum += (Date.parse(arr[i + 1].created_at) - Date.parse(arr[i].created_at));
+    sum += Date.parse(arr[i + 1].created_at) - Date.parse(arr[i].created_at);
   }
   let avg = sum / (arr.length - 1) / oneDay;
   return avg;
@@ -153,7 +155,7 @@ function drawLegend(runner) {
   for (let i = 0; i < counter; i++) {
     date = new Date(Date.parse(runner.history[runner.history.length - 1 - i].created_at));
     text(parseFloat(runner.history[runner.history.length - 1 - i].miles).toFixed(1) + 'mi', mouseX > windowWidth / 2 ? mouseX - 280 : mouseX + 20, mouseY - 155 + 20 * i);
-    text(("0" + date.getDate()).slice(-2) + '.' + ("0" + (date.getMonth() + 1)).slice(-2) + '.' + date.getFullYear(), mouseX < windowWidth / 2 ? mouseX + 80 : mouseX - 220, mouseY - 155 + 20 * i);
+    text(('0' + date.getDate()).slice(-2) + '.' + ('0' + (date.getMonth() + 1)).slice(-2) + '.' + date.getFullYear(), mouseX < windowWidth / 2 ? mouseX + 80 : mouseX - 220, mouseY - 155 + 20 * i);
   }
   text('Total:', mouseX < windowWidth / 2 ? mouseX + 20 : mouseX - 280, mouseY - 50);
   text(getDistanceSum(runner) + 'mi', mouseX > windowWidth / 2 ? mouseX - 220 : mouseX + 80, mouseY - 50);
@@ -172,10 +174,8 @@ function isDaily(runner) {
     let runs = runner.history,
       lastRun = Date.parse(runs[runs.length - 1].created_at),
       lastMidnight = roundDate(lastRun).getDate();
-    if (roundDate(Date.parse(runs[runs.length - 2].created_at)).getDate() < lastMidnight - 1)
-      return false;
-    if (roundDate(Date.parse(runs[runs.length - 3].created_at)).getDate() < lastMidnight - 2 || roundDate(Date.parse(runs[runs.length - 2].created_at)).getDate() > lastMidnight - 1)
-      return false;
+    if (roundDate(Date.parse(runs[runs.length - 2].created_at)).getDate() < lastMidnight - 1) return false;
+    if (roundDate(Date.parse(runs[runs.length - 3].created_at)).getDate() < lastMidnight - 2 || roundDate(Date.parse(runs[runs.length - 2].created_at)).getDate() > lastMidnight - 1) return false;
     return true;
   }
 }
