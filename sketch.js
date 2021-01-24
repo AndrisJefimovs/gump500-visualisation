@@ -6,7 +6,7 @@ const config = {
   lines: 'black'
 };
 
-const url = 'http://gump500-api.glitch.me/api';
+const url = 'https://gump500-api.glitch.me/api';
 
 let data = [],
   bars = [],
