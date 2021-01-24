@@ -6,7 +6,7 @@ const config = {
   lines: 'black'
 };
 
-const url = 'https://demo3884564.mockable.io/gump500';
+const url = 'http://gump500-api.glitch.me/api';
 
 let data = [],
   bars = [],
